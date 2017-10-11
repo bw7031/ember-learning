@@ -17,9 +17,9 @@ export default Mixin.create({
   canLoadMore: true,
   enableSync: true,
 
-  model: null,
+  model: [],
   meta: null,
-  columns: null,
+  columns: [],
   table: null,
 
   init() {
