@@ -25,8 +25,8 @@ export default Mixin.create({
   meta: null,
   columns: [],
 
-  model: 'stats',
-  columns: null,
+  
+  
 
   table: null,
 
@@ -47,7 +47,7 @@ export default Mixin.create({
   fetchRecords() {
     console.log("fetch records: " );
     set(this,'isLoading', true);
-    get(this,"store").query('posts', {per_page: get(this,"limit"), page: get(this,"page")}).then(records => {
+    get(this,"store").query('stats', {per_page: get(this,"limit"), page: get(this,"page")}).then(records => {
       var model = get(this,'model');
       records.forEach(function(record){
         model.addObject(record._internalModel);
