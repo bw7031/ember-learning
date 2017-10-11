@@ -1,53 +1,67 @@
-import Mixin from '@ember/object/mixin';
-import { computed } from '@ember/object';
-import { isEmpty } from '@ember/utils';
-import { inject as service } from '@ember/service';
+import Ember from 'ember';
 import Table from 'ember-light-table';
-import { task } from 'ember-concurrency';
+
+const {
+  Mixin,
+  inject,
+  isEmpty,
+  set,
+  get
+} = Ember;
 
 export default Mixin.create({
-  store: service(),
+  store: inject.service(),
 
   page: 0,
   limit: 10,
   dir: 'asc',
-  sort: 'gamesPlayed',
+  sort: 'HT_OverUnder',
 
-  isLoading: computed.oneWay('fetchRecords.isRunning'),
+  isLoading: false,
   canLoadMore: true,
-  enableSync: true,
+
 
   model: [],
   meta: null,
   columns: [],
+
+  model: 'stats',
+  columns: null,
+
   table: null,
 
   init() {
     this._super(...arguments);
 
-    let table = new Table(this.get('columns'), this.get('model'), { enableSync: this.get('enableSync') });
-    let sortColumn = table.get('allColumns').findBy('valuePath', this.get('sort'));
+    let table = new Table(get(this,'columns'), get(this,'model'), { enableSync: true });
+    let sortColumn = table.get('allColumns').findBy('valuePath', get(this,'sort'));
 
     // Setup initial sort column
     if (sortColumn) {
       sortColumn.set('sorted', true);
     }
 
-    this.set('table', table);
+    set(this,'table',table);
   },
 
-  fetchRecords: task(function*() {
-    let records = yield this.get('store').query('stats', this.getProperties(['page', 'limit', 'sort', 'dir']));
-    this.get('model').pushObjects(records.toArray());
-    this.set('meta', records.get('meta'));
-    this.set('canLoadMore', !isEmpty(records));
-  }).restartable(),
+  fetchRecords() {
+    console.log("fetch records: " );
+    set(this,'isLoading', true);
+    get(this,"store").query('posts', {per_page: get(this,"limit"), page: get(this,"page")}).then(records => {
+      var model = get(this,'model');
+      records.forEach(function(record){
+        model.addObject(record._internalModel);
+      });
+      set(this,'isLoading', false);
+      set(this,'canLoadMore', !isEmpty(records));
+    });
+  },
 
   actions: {
     onScrolledToBottom() {
-      if (this.get('canLoadMore')) {
+      if (get(this,'canLoadMore')) {
         this.incrementProperty('page');
-        this.get('fetchRecords').perform();
+        this.fetchRecords();
       }
     },
 
@@ -59,7 +73,7 @@ export default Mixin.create({
           canLoadMore: true,
           page: 0
         });
-        this.get('model').clear();
+        get(this,'model').clear();
       }
     }
   }
