@@ -1,0 +1,36 @@
+{{#light-table table height='65vh' as |t|}}
+  {{t.head
+    onColumnClick=(action 'onColumnClick')
+    iconSortable='fa fa-sort'
+    iconAscending='fa fa-sort-asc'
+    iconDescending='fa fa-sort-desc'
+    fixed=true
+  }}
+
+  {{#t.body
+    canSelect=true
+    onScrolledToBottom=(action 'onScrolledToBottom')
+    as |body|
+  }}
+   
+   {{#body.expanded-row as |row|}}
+   	The <b>{{row.teamName}}</b>
+   	{{/body.expanded-row}}
+   	
+   	
+   	
+    {{#if isLoading}}
+      {{#body.loader}}
+        {{spinner}}
+      {{/body.loader}}
+    {{/if}}
+    
+    {{#if table.isEmpty}}
+      {{#body.no-data}}
+      No Stats Found.
+      {{/body.no-data}}
+    {{/if}}
+    
+  {{/t.body}}
+  
+{{/light-table}}

@@ -1,0 +1,16 @@
+<h1>Posts</h1>
+
+<ul class="list-unstyled">
+	{{#each}}
+	<li>
+		{{#link-to 'posts' this}}
+		{{title}}
+		<span class="muted">
+			by {{author.name}}
+		</span>
+		{{/link-to}}
+	</li>
+	{{/each}}
+</ul>
+
+
